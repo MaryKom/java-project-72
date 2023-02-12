@@ -65,3 +65,11 @@ jacocoTestReport {
 
 task stage(dependsOn: ['clean', 'installDist'])
 installDist.mustRunAfter clean
+
+testlogger {
+    showStandardStreams = true
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
