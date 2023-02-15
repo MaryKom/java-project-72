@@ -3,6 +3,6 @@ import io.javalin.http.Handler;
 
 public final class RootController {
     public static Handler welcome = ctx -> {
-        ctx.render("templates/index.html");
+        ctx.render("index.html");
     };
 }
