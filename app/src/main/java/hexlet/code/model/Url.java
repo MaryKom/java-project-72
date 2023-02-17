@@ -4,6 +4,7 @@ import io.ebean.Model;
 import io.ebean.annotation.WhenCreated;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.time.Instant;
 
 @Entity
 public final class Url extends Model {
@@ -11,7 +12,7 @@ public final class Url extends Model {
     private long id;
     private String name;
     @WhenCreated
-    private String createdAt;
+    private Instant createdAt;
 
     public Url(String urlName) {
         this.name = urlName;

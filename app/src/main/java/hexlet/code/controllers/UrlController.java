@@ -28,7 +28,7 @@ public final class UrlController {
                 ctx.sessionAttribute("flash", "Страница уже существует");
                 ctx.sessionAttribute("flash-type", "info");
             }
-            ctx.redirect("/urls");
+            ctx.redirect("/");
         }
     };
 
@@ -56,10 +56,13 @@ public final class UrlController {
                 .findPagedList();
 
         List<Url> urls = pagedUrls.getList();
+        int countUrls = new QUrl()
+                .findCount();
 
         ctx.attribute("urls", urls);
         ctx.attribute("page", page);
-        ctx.render("urls.html");
+        ctx.attribute("count", countUrls);
+        ctx.render("urls/urls.html");
     };
 
     public static Handler showUrl = ctx -> {
@@ -70,7 +73,7 @@ public final class UrlController {
                 .findOne();
 
         ctx.attribute("url", url);
-        ctx.render("articles/show.html");
+        ctx.render("/urls/show.html");
     };
 
 }
