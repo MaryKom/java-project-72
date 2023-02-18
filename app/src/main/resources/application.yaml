@@ -12,7 +12,7 @@ datasource:
 ebean:
   development:
     migration:
-      run: false
+      run: true
   production:
     migration:
       run: true
