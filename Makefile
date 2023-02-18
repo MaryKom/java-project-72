@@ -12,8 +12,7 @@ run-dist:
 	make -C app run-dist
 
 run:
-	make -C app clean
-	make -C app run
+	make -C app clean run
 
 test:
 	make -C app test
