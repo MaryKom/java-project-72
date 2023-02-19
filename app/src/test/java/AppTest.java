@@ -66,6 +66,27 @@ public class AppTest {
     }
 
     @Test
+    void testUrl() {
+        HttpResponse<String> response = Unirest
+                .get(baseUrl + "/urls/1")
+                .asString();
+
+        assertThat(response.getStatus()).isEqualTo(200);
+        assertThat(response.getBody()).contains("https://www.github.com");
+    }
+
+    @Test
+    void testUrls() {
+        HttpResponse<String> response = Unirest
+                .get(baseUrl + "/urls")
+                .asString();
+
+        assertThat(response.getStatus()).isEqualTo(200);
+        assertThat(response.getBody()).contains("https://www.github.com");
+        assertThat(response.getBody()).contains("https://www.railway.app");
+    }
+
+    @Test
     void testIncorrectAddUrl() {
         final String incorrectUrl = "trompompom.com";
 

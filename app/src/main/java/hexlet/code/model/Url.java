@@ -25,4 +25,8 @@ public final class Url extends Model {
     public String getName() {
         return name;
     }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
 }
