@@ -50,6 +50,7 @@ public final class App {
                 post(UrlController.addUrl);
                 get(UrlController.listUrls);
                 get("{id}", UrlController.showUrl);
+                post("{id}/checks", UrlController.checkUrl);
             });
         });
     }
