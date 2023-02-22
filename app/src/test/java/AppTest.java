@@ -1,6 +1,9 @@
 import hexlet.code.App;
+import hexlet.code.controllers.UrlController;
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
 import hexlet.code.model.query.QUrl;
+import hexlet.code.model.query.QUrlCheck;
 import io.ebean.Transaction;
 import org.junit.jupiter.api.*;
 
@@ -13,6 +16,10 @@ import io.ebean.DB;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
 public class AppTest {
     @Test
@@ -164,5 +171,79 @@ public class AppTest {
         assertThat(content).contains("https://www.github.com");
         assertThat(content).contains("description");
         assertThat(content).contains("Запустить проверку");
+    }
+
+    /*@Test
+    void testCheckUrl() throws Exception {
+        MockWebServer server = new MockWebServer();
+        String serverUrl = server.url("/").toString();
+        String correctServerUrl = serverUrl.substring(0, serverUrl.length() - 1);
+
+        String expectedBody = Files.readString(Path.of("src/test/resources/test.html"));
+
+        server.enqueue(new MockResponse().setBody(expectedBody));
+
+        HttpResponse response = Unirest
+                .post(baseUrl + "/urls")
+                .field("url", serverUrl)
+                .asEmpty();
+
+        Url url = new QUrl()
+                .name.equalTo(correctServerUrl)
+                .findOne();
+
+        assert url != null;
+        long urlId = url.getId();
+
+        assertThat(url).isNotNull();
+
+        HttpResponse responseToCheck = Unirest
+                .post(baseUrl + "/urls/" + urlId + "/checks")
+                .asEmpty();
+
+        HttpResponse<String> responseResult = Unirest
+                .get(baseUrl + "/urls/" + urlId)
+                .asString();
+
+        String responseBody = responseResult.getBody();
+        assertThat(responseBody).contains("Страница успешно проверена");
+
+        List<UrlCheck> actualCheck = new QUrlCheck()
+                .findList();
+
+        assertThat(actualCheck).isNotEmpty();
+
+        String content = responseResult.getBody();
+
+        assertThat(content).contains("Хекслет");
+        assertThat(content).contains("Живое онлайн сообщество");
+        assertThat(content).contains("Это заголовок h1");
+
+        server.shutdown();
+    }*/
+
+    @Test
+    void testRedirectUrl() {
+        final String testRedirect = "https://www.youtube.com";
+
+        HttpResponse response = Unirest
+                .post(baseUrl + "/urls")
+                .field("url", testRedirect)
+                .asEmpty();
+
+        assertThat(response.getStatus()).isEqualTo(302);
+        assertThat(response.getHeaders().getFirst("Location")).isEqualTo("/urls");
+    }
+
+    @Test
+    void testParseUrl() {
+        String expected1 = "https://www.example.com";
+        String expected2 = "https://www.example.com:8080";
+        String actual1 = UrlController.parseUrl("https://www.example.com/one/two");
+        String actual2 = UrlController.parseUrl("https://www.example.com:8080/one/two");
+        String actual3 = UrlController.parseUrl("www.example.com");
+        assertThat(actual1).isEqualTo(expected1);
+        assertThat(actual2).isEqualTo(expected2);
+        assertThat(actual3).isEqualTo(null);
     }
 }
