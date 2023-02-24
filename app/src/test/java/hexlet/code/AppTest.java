@@ -1,13 +1,12 @@
 package hexlet.code;
 
-import hexlet.code.App;
 import hexlet.code.controllers.UrlController;
 import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
 import hexlet.code.model.query.QUrl;
 import hexlet.code.model.query.QUrlCheck;
 import io.ebean.Transaction;
-import org.junit.jupiter.api.*;
+
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,6 +17,12 @@ import io.ebean.DB;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 
 import java.io.IOException;
 import java.nio.file.Files;
