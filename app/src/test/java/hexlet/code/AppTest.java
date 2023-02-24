@@ -1,3 +1,5 @@
+package hexlet.code;
+
 import hexlet.code.App;
 import hexlet.code.controllers.UrlController;
 import hexlet.code.model.Url;
@@ -17,6 +19,7 @@ import io.ebean.DB;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -30,18 +33,25 @@ public class AppTest {
     private static Javalin app;
     private static String baseUrl;
     private static Transaction transaction;
+    private static MockWebServer server;
 
     @BeforeAll
-    public static void beforeAll() {
+    public static void beforeAll() throws IOException {
         app = App.getApp();
         app.start(0);
         int port = app.port();
         baseUrl = "http://localhost:" + port;
+
+        server = new MockWebServer();
+        String expectedBody = Files.readString(Path.of("src/test/resources/test.html"));
+        server.enqueue(new MockResponse().setBody(expectedBody));
+        server.start();
     }
 
     @AfterAll
-    public static void afterAll() {
+    public static void afterAll() throws IOException {
         app.stop();
+        server.shutdown();
     }
 
     // Тесты не зависят друг от друга
@@ -126,6 +136,13 @@ public class AppTest {
         assertThat(responseP.getStatus()).isEqualTo(302);
         assertThat(responseP.getHeaders().getFirst("Location")).isEqualTo("/urls");
 
+        Url postedUrl = new QUrl()
+                .name.equalTo(urlName)
+                .findOne();
+
+        assertThat(postedUrl).isNotNull();
+        assertThat(postedUrl.getName()).isEqualTo(urlName);
+
         HttpResponse<String> response = Unirest
                 .get(baseUrl + "/urls")
                 .asString();
@@ -173,15 +190,11 @@ public class AppTest {
         assertThat(content).contains("Запустить проверку");
     }
 
-    /*@Test
-    void testCheckUrl() throws Exception {
-        MockWebServer server = new MockWebServer();
+    @Test
+    void testCheckUrl() throws IOException {
         String serverUrl = server.url("/").toString();
         String correctServerUrl = serverUrl.substring(0, serverUrl.length() - 1);
 
-        String expectedBody = Files.readString(Path.of("src/test/resources/test.html"));
-
-        server.enqueue(new MockResponse().setBody(expectedBody));
 
         HttpResponse response = Unirest
                 .post(baseUrl + "/urls")
@@ -219,8 +232,7 @@ public class AppTest {
         assertThat(content).contains("Живое онлайн сообщество");
         assertThat(content).contains("Это заголовок h1");
 
-        server.shutdown();
-    }*/
+    }
 
     @Test
     void testRedirectUrl() {
