@@ -37,4 +37,17 @@ public final class Url extends Model {
     public List<UrlCheck> getUrlChecks() {
         return urlChecks;
     }
+
+    public Instant getLastCheckDate() {
+        if (!urlChecks.isEmpty()) {
+            return urlChecks.get(urlChecks.size() - 1).getCreatedAt();
+        }
+        return null;
+    }
+    public Integer getLastCheckStatus() {
+        if (!urlChecks.isEmpty()) {
+            return urlChecks.get(urlChecks.size() - 1).getStatusCode();
+        }
+        return null;
+    }
 }
