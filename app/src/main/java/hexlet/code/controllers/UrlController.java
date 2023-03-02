@@ -2,9 +2,7 @@ package hexlet.code.controllers;
 import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
 import hexlet.code.model.query.QUrl;
-import hexlet.code.model.query.QUrlCheck;
 import io.ebean.PagedList;
-//import io.ebeaninternal.server.util.Str;
 import io.javalin.http.Handler;
 import io.javalin.http.NotFoundResponse;
 
@@ -26,21 +24,24 @@ public final class UrlController {
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");
             ctx.redirect("/");
-        } else {
-            Url url = new QUrl()
-                    .name.equalTo(parsedUrl)
-                    .findOne();
-            if (url == null) {
-                url = new Url(parsedUrl);
-                url.save();
-                ctx.sessionAttribute("flash", "Страница успешно добавлена");
-                ctx.sessionAttribute("flash-type", "success");
-            } else {
-                ctx.sessionAttribute("flash", "Страница уже существует");
-                ctx.sessionAttribute("flash-type", "info");
-            }
-            ctx.redirect("/urls");
+            return;
         }
+
+        Url url = new QUrl()
+                .name.equalTo(parsedUrl)
+                .findOne();
+        if (url != null) {
+            ctx.sessionAttribute("flash", "Страница уже существует");
+            ctx.sessionAttribute("flash-type", "info");
+            return;
+        }
+
+        url = new Url(parsedUrl);
+        url.save();
+        ctx.sessionAttribute("flash", "Страница успешно добавлена");
+        ctx.sessionAttribute("flash-type", "success");
+
+        ctx.redirect("/urls");
     };
 
     public static String parseUrl(String inputUrl) {
@@ -82,11 +83,7 @@ public final class UrlController {
         Url url = new QUrl()
                 .id.equalTo(id)
                 .findOne();
-        List<UrlCheck> checks = new QUrlCheck()
-                .url.equalTo(url)
-                .orderBy()
-                .id.desc()
-                .findList();
+        List<UrlCheck> checks = url.getUrlChecks();
 
         ctx.attribute("url", url);
         ctx.attribute("checks", checks);
@@ -98,10 +95,10 @@ public final class UrlController {
         Url url = new QUrl()
                 .id.equalTo(id)
                 .findOne();
+        if (url == null) {
+            throw new NotFoundResponse();
+        }
         try {
-            if (url == null) {
-                throw new NotFoundResponse();
-            }
             String urlName = url.getName();
             HttpResponse<String> response = Unirest
                     .get(urlName)
@@ -133,9 +130,8 @@ public final class UrlController {
         } catch (UnirestException e) {
             ctx.sessionAttribute("flash", "Некорректный адрес");
             ctx.sessionAttribute("flash-type", "danger");
-        } finally {
-            ctx.redirect("/urls/" + id);
         }
+        ctx.redirect("/urls/" + id);
     };
 
 }
